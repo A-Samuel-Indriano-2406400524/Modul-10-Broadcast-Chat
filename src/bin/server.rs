@@ -13,11 +13,16 @@ async fn handle_connection(
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     let mut bcast_rx = bcast_tx.subscribe();
 
+    ws_stream
+        .send(Message::text("Welcome to chat! Type a message"))
+        .await?;
+
     loop {
         tokio::select! {
             msg = ws_stream.next() => match msg {
                 Some(Ok(msg)) => {
                     if let Some(text) = msg.as_text() {
+                        println!("From client {addr} {:?}", text);
                         bcast_tx.send(format!("{addr}: {text}"))?;
                     }
                 }
@@ -44,7 +49,7 @@ async fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 
     loop {
         let (socket, addr) = listener.accept().await?;
-        println!("New connection from {addr:?}");
+        println!("New connection from {addr}");
         let bcast_tx = bcast_tx.clone();
 
         tokio::spawn(async move {

@@ -4,6 +4,8 @@ use http::Uri;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio_websockets::{ClientBuilder, Message};
 
+const SIGNATURE: &str = "Sam's Komputer";
+
 #[tokio::main]
 async fn main() -> Result<(), tokio_websockets::Error> {
     let (mut ws_stream, _) =
@@ -23,7 +25,7 @@ async fn main() -> Result<(), tokio_websockets::Error> {
             msg = ws_stream.next() => match msg {
                 Some(Ok(msg)) => {
                     if let Some(text) = msg.as_text() {
-                        println!("From server: {text}");
+                        println!("{SIGNATURE} - From server: {text}");
                     }
                 }
                 Some(Err(err)) => return Err(err),
